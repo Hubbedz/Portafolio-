@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Humbe Díaz — Fotografía</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #0a0a0a;
+      --ink-soft:  #161616;
+      --mid:       #3d3d3d;
+      --dust:      #6e6e6e;
+      --silver:    #ababab;
+      --paper:     #e8e6e2;
+      --white:     #f2f0ed;
+      --line:      rgba(242,240,237,.09);
+      --line-mid:  rgba(242,240,237,.16);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN LAYER ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9000;
+      opacity: .72;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='.9'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    /* ── CURSOR ── */
+    .cur {
+      width: 5px; height: 5px;
+      background: var(--white);
+      border-radius: 50%;
+      position: fixed; top:0; left:0;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+    }
+    .cur-o {
+      width: 28px; height: 28px;
+      border: 1px solid rgba(242,240,237,.3);
+      border-radius: 50%;
+      position: fixed; top:0; left:0;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width .22s, height .22s, border-color .2s;
+    }
+    .cur-o.lg { width:50px; height:50px; border-color: rgba(242,240,237,.15); }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top:0; left:0; right:0; z-index:500;
+      padding: 32px 52px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    nav::before {
+      content: '';
+      position: absolute; inset:0;
+      background: linear-gradient(to bottom, rgba(10,10,10,.7) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .nav-logo {
+      font-family: 'EB Garamond', serif;
+      font-size: 1rem;
+      letter-spacing: .12em;
+      font-weight: 400;
+      line-height: 1.4;
+      position: relative;
+    }
+    .nav-logo span {
+      display: block;
+      font-size: .6rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--dust);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 4px;
+      align-items: flex-end;
+      position: relative;
+    }
+    .nav-links a {
+      font-size: .6rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--dust);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Atmospheric blur background — pure CSS, no photo */
+    .hero-bg {
+      position: absolute; inset: -40px;
+      z-index: 0;
+    }
+    .hero-bg canvas { width:100%; height:100%; display:block; }
+
+    /* Dashed circle guides (like the reference) */
+    .hero-circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px dashed rgba(242,240,237,.08);
+      pointer-events: none; z-index: 1;
+    }
+    .hero-circle-1 { width:65vmin; height:65vmin; top:50%; left:50%; transform:translate(-50%,-50%); }
+    .hero-circle-2 { width:90vmin; height:90vmin; top:50%; left:50%; transform:translate(-50%,-50%); }
+
+    /* Thin grid lines */
+    .hero-grid {
+      position: absolute; inset:0; z-index:1;
+      background-image:
+        linear-gradient(to right, rgba(242,240,237,.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(242,240,237,.04) 1px, transparent 1px);
+      background-size: 25% 25%;
+    }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .hero-eyebrow {
+      font-size: .58rem;
+      letter-spacing: .38em;
+      text-transform: uppercase;
+      color: var(--dust);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp .9s .4s forwards;
+    }
+    .hero-name {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      font-weight: 400;
+      letter-spacing: .06em;
+      line-height: 1.05;
+      color: var(--white);
+      opacity: 0;
+      animation: fadeUp .9s .6s forwards;
+    }
+    .hero-name em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--silver);
+    }
+    .hero-rule {
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, transparent, var(--dust), transparent);
+      margin: 28px auto;
+      opacity: 0;
+      animation: fadeIn .9s .85s forwards;
+    }
+    .hero-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: .95rem;
+      letter-spacing: .12em;
+      color: var(--dust);
+      opacity: 0;
+      animation: fadeUp .9s 1s forwards;
+    }
+
+    /* Bottom corners */
+    .hero-bottom {
+      position: absolute; bottom:32px; left:52px; right:52px;
+      z-index: 2;
+      display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    .hero-scroll {
+      font-size: .55rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--mid);
+      writing-mode: vertical-lr;
+      display: flex; align-items: center; gap:10px;
+      opacity: 0;
+      animation: fadeIn 1s 1.4s forwards;
+    }
+    .hero-scroll::after {
+      content:''; width:1px; height:36px;
+      background: var(--mid);
+    }
+    .hero-year {
+      font-size: .55rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--mid);
+      opacity: 0;
+      animation: fadeIn 1s 1.4s forwards;
+    }
+
+    /* ── SECTION MARKER ── */
+    .sec-head {
+      padding: 88px 52px 0;
+      display: flex; align-items: baseline; gap: 18px;
+    }
+    .sec-num {
+      font-family: 'EB Garamond', serif;
+      font-size: .75rem;
+      color: var(--mid);
+      letter-spacing: .2em;
+    }
+    .sec-title {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      letter-spacing: .14em;
+      color: var(--silver);
+    }
+    .sec-line {
+      flex:1; height:1px;
+      background: var(--line);
+      margin-bottom: 4px;
+    }
+
+    /* ── GALLERY ── */
+    .gallery { padding: 44px 52px 96px; }
+    .masonry { columns:3; column-gap: 8px; }
+
+    .photo-item {
+      break-inside: avoid;
+      margin-bottom: 8px;
+      position: relative; overflow: hidden;
+      cursor: none;
+    }
+    .photo-item img {
+      width:100%; display:block;
+      filter: grayscale(100%) contrast(1.08) brightness(.85);
+      transition: transform .75s cubic-bezier(.25,.46,.45,.94), filter .5s;
+    }
+    .photo-item:hover img {
+      transform: scale(1.04);
+      filter: grayscale(100%) contrast(1.12) brightness(.9);
+    }
+    .photo-over {
+      position: absolute; inset:0;
+      background: linear-gradient(to top, rgba(10,10,10,.8) 0%, transparent 55%);
+      opacity: 0; transition: opacity .4s;
+      display: flex; align-items: flex-end;
+      padding: 16px 18px;
+    }
+    .photo-item:hover .photo-over { opacity:1; }
+    .photo-meta { display:flex; flex-direction:column; gap:3px; }
+    .photo-t {
+      font-family: 'EB Garamond', serif;
+      font-style: italic; font-size: .85rem;
+      color: var(--white);
+      transform: translateY(5px); transition: transform .3s .05s;
+    }
+    .photo-l {
+      font-size: .56rem; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--silver);
+      transform: translateY(5px); transition: transform .3s .1s;
+    }
+    .photo-item:hover .photo-t,
+    .photo-item:hover .photo-l { transform: translateY(0); }
+    .photo-n {
+      position: absolute; top:12px; right:14px;
+      font-family: 'EB Garamond', serif;
+      font-size: .7rem; color: rgba(242,240,237,.2);
+      opacity:0; transition: opacity .3s;
+    }
+    .photo-item:hover .photo-n { opacity:1; }
+
+    /* ── ABOUT ── */
+    .about {
+      border-top: 1px solid var(--line);
+      display: grid; grid-template-columns: 42% 58%;
+    }
+    .about-img {
+      position: relative; overflow: hidden;
+      min-height: 480px;
+    }
+    .about-img img {
+      width:100%; height:100%; object-fit:cover;
+      filter: grayscale(100%) contrast(1.08) brightness(.72);
+    }
+    .about-img::after {
+      content:'';
+      position:absolute; inset:0;
+      background: linear-gradient(to right, transparent 65%, var(--ink) 100%);
+    }
+    .about-body {
+      padding: 72px 52px;
+      display:flex; flex-direction:column; justify-content:center;
+      border-left: 1px solid var(--line);
+    }
+    .about-ey {
+      font-size: .56rem; letter-spacing:.35em;
+      text-transform:uppercase; color: var(--mid);
+      margin-bottom:18px;
+    }
+    .about-h {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(1.5rem, 2.2vw, 2.1rem);
+      font-weight:400; line-height:1.3;
+      margin-bottom:24px;
+      color: var(--white);
+    }
+    .about-h em { font-style:italic; color: var(--silver); }
+    .about-p {
+      font-size:.78rem; line-height:1.95;
+      color: var(--dust); max-width:380px;
+    }
+    .about-p + .about-p { margin-top:14px; }
+    .about-stats {
+      margin-top:44px;
+      display:grid; grid-template-columns:repeat(3,1fr);
+      border-top:1px solid var(--line); padding-top:32px;
+      gap:0;
+    }
+    .stat { border-right:1px solid var(--line); padding: 0 24px 0 0; }
+    .stat:first-child { padding-left:0; }
+    .stat:last-child { border-right:none; padding-left:24px; }
+    .stat:nth-child(2) { padding-left:24px; }
+    .stat-n {
+      font-family:'EB Garamond', serif;
+      font-size:2.4rem; font-weight:400;
+      color:var(--white); line-height:1;
+    }
+    .stat-l {
+      font-size:.54rem; letter-spacing:.22em;
+      text-transform:uppercase; color:var(--mid);
+      margin-top:5px;
+    }
+
+    /* ── SERIES ── */
+    .series-wrap { padding: 0 52px 88px; }
+    .series-grid {
+      display:grid; grid-template-columns:repeat(3,1fr);
+      border:1px solid var(--line);
+    }
+    .s-item {
+      position:relative; overflow:hidden;
+      aspect-ratio:3/4; cursor:none;
+      border-right:1px solid var(--line);
+    }
+    .s-item:last-child { border-right:none; }
+    .s-item img {
+      width:100%; height:100%; object-fit:cover;
+      filter: grayscale(100%) contrast(1.1) brightness(.55);
+      transition: transform .9s cubic-bezier(.25,.46,.45,.94), filter .5s;
+    }
+    .s-item:hover img {
+      transform: scale(1.06);
+      filter: grayscale(100%) contrast(1.12) brightness(.45);
+    }
+    .s-over {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column; justify-content:flex-end;
+      padding:28px;
+      background: linear-gradient(to top, rgba(10,10,10,.9) 0%, transparent 55%);
+    }
+    .s-num {
+      font-size:.56rem; letter-spacing:.3em;
+      text-transform:uppercase; color:var(--mid);
+      margin-bottom:8px;
+    }
+    .s-name {
+      font-family:'EB Garamond', serif;
+      font-size:1.35rem; font-weight:400;
+      letter-spacing:.06em; line-height:1.2;
+      margin-bottom:10px; color:var(--white);
+    }
+    .s-desc {
+      font-size:.7rem; line-height:1.75;
+      color:var(--dust); max-width:220px;
+      opacity:0; transform:translateY(8px);
+      transition: opacity .35s, transform .35s;
+    }
+    .s-item:hover .s-desc { opacity:1; transform:translateY(0); }
+    .s-bar {
+      position:absolute; top:0; left:0; right:0;
+      height:1px; background:var(--silver);
+      transform:scaleX(0); transform-origin:left;
+      transition: transform .6s cubic-bezier(.77,0,.18,1);
+    }
+    .s-item:hover .s-bar { transform:scaleX(1); }
+
+    /* ── CONTACT ── */
+    .contact {
+      border-top:1px solid var(--line);
+      display:grid; grid-template-columns:1fr 1fr;
+    }
+    .contact-l {
+      padding:80px 52px;
+      border-right:1px solid var(--line);
+      display:flex; flex-direction:column; justify-content:center;
+    }
+    .contact-ey {
+      font-size:.56rem; letter-spacing:.35em;
+      text-transform:uppercase; color:var(--mid);
+      margin-bottom:18px;
+    }
+    .contact-h {
+      font-family:'EB Garamond', serif;
+      font-size:clamp(2rem,3.5vw,3.4rem);
+      font-weight:400; line-height:1.15;
+      margin-bottom:20px; color:var(--white);
+    }
+    .contact-h em { font-style:italic; color:var(--silver); }
+    .contact-p {
+      font-size:.76rem; line-height:1.9;
+      color:var(--dust); max-width:300px;
+    }
+    .contact-email {
+      margin-top:36px;
+      font-family:'EB Garamond', serif;
+      font-style:italic; font-size:.95rem;
+      color:var(--silver); text-decoration:none;
+      display:inline-flex; align-items:center; gap:12px;
+      transition:color .2s;
+    }
+    .contact-email::after {
+      content:''; width:28px; height:1px;
+      background:var(--silver); transition:width .3s;
+    }
+    .contact-email:hover { color:var(--white); }
+    .contact-email:hover::after { width:48px; }
+
+    .contact-r {
+      padding:80px 52px;
+      display:flex; flex-direction:column; justify-content:center; gap:20px;
+    }
+    .f-row { display:flex; flex-direction:column; gap:7px; }
+    .f-row label {
+      font-size:.54rem; letter-spacing:.26em;
+      text-transform:uppercase; color:var(--mid);
+    }
+    .f-row input, .f-row textarea {
+      background:transparent; border:none;
+      border-bottom:1px solid rgba(242,240,237,.14);
+      padding:9px 0; color:var(--white);
+      font-family:'Raleway',sans-serif;
+      font-size:.82rem; font-weight:300;
+      outline:none; resize:none;
+      caret-color:var(--silver);
+      transition:border-color .3s;
+    }
+    .f-row input:focus, .f-row textarea:focus {
+      border-color:rgba(242,240,237,.38);
+    }
+    .f-row textarea { height:68px; }
+    .f-btn {
+      align-self:flex-start;
+      margin-top:4px; padding:11px 28px;
+      background:transparent;
+      border:1px solid rgba(242,240,237,.18);
+      color:var(--silver);
+      font-family:'Raleway',sans-serif;
+      font-size:.56rem; letter-spacing:.26em;
+      text-transform:uppercase;
+      cursor:none;
+      transition:background .3s, border-color .3s, color .3s;
+    }
+    .f-btn:hover {
+      background:rgba(242,240,237,.08);
+      border-color:rgba(242,240,237,.35);
+      color:var(--white);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top:1px solid var(--line);
+      padding:24px 52px;
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:.54rem; letter-spacing:.2em;
+      text-transform:uppercase; color:var(--mid);
+    }
+    .ft-social { display:flex; gap:24px; }
+    .ft-social a {
+      color:var(--mid); text-decoration:none;
+      transition:color .2s;
+    }
+    .ft-social a:hover { color:var(--white); }
+
+    /* ── LIGHTBOX ── */
+    .lb {
+      position:fixed; inset:0;
+      background:rgba(6,6,6,.96);
+      z-index:800;
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none;
+      transition:opacity .4s;
+    }
+    .lb.on { opacity:1; pointer-events:all; }
+    .lb img {
+      max-width:80vw; max-height:80vh;
+      object-fit:contain;
+      filter:grayscale(100%) contrast(1.08);
+    }
+    .lb-close {
+      position:absolute; top:26px; right:40px;
+      font-size:.54rem; letter-spacing:.26em;
+      text-transform:uppercase; color:var(--mid);
+      cursor:none; transition:color .2s;
+    }
+    .lb-close:hover { color:var(--white); }
+    .lb-cap {
+      position:absolute; bottom:30px; left:50%;
+      transform:translateX(-50%);
+      font-family:'EB Garamond',serif; font-style:italic;
+      font-size:.88rem; color:var(--dust);
+      white-space:nowrap;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(18px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; } to { opacity:1; }
+    }
+    .reveal {
+      opacity:0; transform:translateY(24px);
+      transition: opacity .85s cubic-bezier(.25,.46,.45,.94), transform .85s cubic-bezier(.25,.46,.45,.94);
+    }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s}
+
+    @media(max-width:860px){
+      .masonry{columns:2}
+      .about{grid-template-columns:1fr}
+      .about-img{min-height:300px}
+      .contact{grid-template-columns:1fr}
+      .contact-l{border-right:none;border-bottom:1px solid var(--line)}
+      .series-grid{grid-template-columns:1fr}
+      .s-item{border-right:none;border-bottom:1px solid var(--line)}
+      nav, .gallery, .sec-head, .series-wrap, .about-body, .contact-l, .contact-r, footer{padding-left:22px;padding-right:22px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-o" id="curO"></div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb">
+  <span class="lb-close" id="lbClose">Cerrar ✕</span>
+  <img src="" id="lbImg" alt=""/>
+  <div class="lb-cap" id="lbCap"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    Humbe Díaz
+    <span>Fotografía — México</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#galeria">Galería</a></li>
+    <li><a href="#sobre">Sobre mí</a></li>
+    <li><a href="#series">Series</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <canvas id="heroCanvas"></canvas>
+  </div>
+  <div class="hero-grid"></div>
+  <div class="hero-circle hero-circle-1"></div>
+  <div class="hero-circle hero-circle-2"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Fotografía documental — 2016 · 2026</p>
+    <h1 class="hero-name">Humbe <em>Díaz</em></h1>
+    <div class="hero-rule"></div>
+    <p class="hero-tagline">La oscuridad también es una forma de mirar</p>
+  </div>
+
+  <div class="hero-bottom">
+    <div class="hero-scroll">Desplazar</div>
+    <div class="hero-year">México · D.F.</div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="galeria">
+  <div class="sec-head reveal">
+    <span class="sec-num">01</span>
+    <h2 class="sec-title">Galería</h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="gallery">
+    <div class="masonry">
+
+      <div class="photo-item reveal" data-src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=900&q=80" data-cap="Sin título — Ciudad de México, 2023">
+        <img src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">Sin título</span><span class="photo-l">Ciudad de México, 2023</span></div></div>
+        <span class="photo-n">001</span>
+      </div>
+
+      <div class="photo-item reveal d1" data-src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=900&q=80" data-cap="Umbral — Oaxaca, 2022">
+        <img src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">Umbral</span><span class="photo-l">Oaxaca, 2022</span></div></div>
+        <span class="photo-n">002</span>
+      </div>
+
+      <div class="photo-item reveal d2" data-src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=900&q=80" data-cap="Polvo de luz — Monterrey, 2024">
+        <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">Polvo de luz</span><span class="photo-l">Monterrey, 2024</span></div></div>
+        <span class="photo-n">003</span>
+      </div>
+
+      <div class="photo-item reveal" data-src="https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=900&q=80" data-cap="Callejón — Guanajuato, 2021">
+        <img src="https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">Callejón</span><span class="photo-l">Guanajuato, 2021</span></div></div>
+        <span class="photo-n">004</span>
+      </div>
+
+      <div class="photo-item reveal d1" data-src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80" data-cap="Silencio vertical — Puebla, 2023">
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">Silencio vertical</span><span class="photo-l">Puebla, 2023</span></div></div>
+        <span class="photo-n">005</span>
+      </div>
+
+      <div class="photo-item reveal d2" data-src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=900&q=80" data-cap="La vigilia — Guadalajara, 2022">
+        <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">La vigilia</span><span class="photo-l">Guadalajara, 2022</span></div></div>
+        <span class="photo-n">006</span>
+      </div>
+
+      <div class="photo-item reveal" data-src="https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=900&q=80" data-cap="Cielos nocturnos — Baja California, 2024">
+        <img src="https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">Cielos nocturnos</span><span class="photo-l">Baja California, 2024</span></div></div>
+        <span class="photo-n">007</span>
+      </div>
+
+      <div class="photo-item reveal d1" data-src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=900&q=80" data-cap="Quietud — Chiapas, 2021">
+        <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">Quietud</span><span class="photo-l">Chiapas, 2021</span></div></div>
+        <span class="photo-n">008</span>
+      </div>
+
+      <div class="photo-item reveal d2" data-src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80" data-cap="Horizonte — Yucatán, 2023">
+        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80" alt="">
+        <div class="photo-over"><div class="photo-meta"><span class="photo-t">Horizonte</span><span class="photo-l">Yucatán, 2023</span></div></div>
+        <span class="photo-n">009</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="sobre" class="about">
+  <div class="about-img reveal">
+    <img src="https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=700&q=80" alt="Humbe Díaz"/>
+  </div>
+  <div class="about-body reveal d1">
+    <p class="about-ey">Sobre mí</p>
+    <h2 class="about-h">El encuadre como<br><em>acto de elección</em></h2>
+    <p class="about-p">Soy fotógrafo documental y de autor con sede en México. Durante más de una década he explorado los márgenes: los espacios donde la luz apenas llega y donde los sujetos revelan lo que normalmente ocultan.</p>
+    <p class="about-p">Mi trabajo ha sido publicado en revistas editoriales internacionales y exhibido en galerías de México, España y Argentina.</p>
+    <div class="about-stats">
+      <div class="stat">
+        <div class="stat-n">14</div>
+        <div class="stat-l">Años activo</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">32</div>
+        <div class="stat-l">Exposiciones</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">9</div>
+        <div class="stat-l">Países</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERIES -->
+<section id="series">
+  <div class="sec-head reveal">
+    <span class="sec-num">02</span>
+    <h2 class="sec-title">Series</h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="series-wrap" style="padding-top:40px;">
+    <div class="series-grid">
+      <div class="s-item reveal">
+        <img src="https://images.unsplash.com/photo-1485081669581-baf956be4eb0?w=700&q=80" alt="">
+        <div class="s-bar"></div>
+        <div class="s-over">
+          <div class="s-num">Serie 01</div>
+          <div class="s-name">Sombra Larga</div>
+          <p class="s-desc">Retratos tomados en las horas críticas del día. La sombra como extensión psicológica del sujeto.</p>
+        </div>
+      </div>
+      <div class="s-item reveal d1">
+        <img src="https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?w=700&q=80" alt="">
+        <div class="s-bar"></div>
+        <div class="s-over">
+          <div class="s-num">Serie 02</div>
+          <div class="s-name">Tierra Muerta</div>
+          <p class="s-desc">Paisajes áridos del norte de México. La aridez como metáfora de lo que el tiempo borra sin prisa.</p>
+        </div>
+      </div>
+      <div class="s-item reveal d2">
+        <img src="https://images.unsplash.com/photo-1490914327627-9fe8d52f4d90?w=700&q=80" alt="">
+        <div class="s-bar"></div>
+        <div class="s-over">
+          <div class="s-num">Serie 03</div>
+          <div class="s-name">Ruido Urbano</div>
+          <p class="s-desc">La ciudad como organismo caótico. Largas exposiciones que disuelven la figura humana en movimiento.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contacto" class="contact">
+  <div class="contact-l reveal">
+    <p class="contact-ey">Contacto</p>
+    <h2 class="contact-h"><em>Hablemos</em><br>de trabajo</h2>
+    <p class="contact-p">Disponible para proyectos editoriales, documentales, exposiciones y colaboraciones con marcas culturales.</p>
+    <a href="mailto:hola@humbediaz.com" class="contact-email">hola@humbediaz.com</a>
+  </div>
+  <div class="contact-r reveal d1">
+    <div class="f-row">
+      <label>Nombre</label>
+      <input type="text" placeholder="Tu nombre completo">
+    </div>
+    <div class="f-row">
+      <label>Correo electrónico</label>
+      <input type="email" placeholder="tu@correo.com">
+    </div>
+    <div class="f-row">
+      <label>Tipo de proyecto</label>
+      <input type="text" placeholder="Editorial, retrato, documental…">
+    </div>
+    <div class="f-row">
+      <label>Mensaje</label>
+      <textarea placeholder="Cuéntame sobre tu proyecto…"></textarea>
+    </div>
+    <button class="f-btn">Enviar mensaje</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Humbe Díaz — Todos los derechos reservados</span>
+  <div class="ft-social">
+    <a href="#">Instagram</a>
+    <a href="#">Behance</a>
+    <a href="#">VSCO</a>
+  </div>
+</footer>
+
+<script>
+/* ── Cursor ── */
+const cur = document.getElementById('cur');
+const curO = document.getElementById('curO');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function a(){
+  cur.style.cssText=`left:${mx}px;top:${my}px`;
+  rx+=(mx-rx)*.14; ry+=(my-ry)*.14;
+  curO.style.cssText=`left:${rx}px;top:${ry}px`;
+  requestAnimationFrame(a);
+})();
+document.querySelectorAll('a,button,.photo-item,.s-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>curO.classList.add('lg'));
+  el.addEventListener('mouseleave',()=>curO.classList.remove('lg'));
+});
+
+/* ── Hero canvas — atmospheric blur blobs ── */
+(function(){
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resize(){
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Blobs: each is a glowing orb of grey
+  const blobs = [
+    { x:.28, y:.55, r:.38, c:'rgba(255,255,255,', a:.22, vx:.00012, vy:-.00008 },
+    { x:.65, y:.42, r:.32, c:'rgba(200,200,200,', a:.14, vx:-.0001,  vy:.00007  },
+    { x:.50, y:.62, r:.50, c:'rgba(255,255,255,', a:.10, vx:.00008,  vy:.00012  },
+    { x:.18, y:.30, r:.28, c:'rgba(160,160,160,', a:.12, vx:.00009,  vy:.00005  },
+    { x:.80, y:.70, r:.30, c:'rgba(220,220,220,', a:.09, vx:-.00007, vy:-.0001  },
+  ];
+
+  let t = 0;
+  function draw(){
+    t++;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0a0a0a';
+    ctx.fillRect(0,0,W,H);
+
+    blobs.forEach(b=>{
+      const bx = (b.x + Math.sin(t*b.vx*300)*0.06) * W;
+      const by = (b.y + Math.cos(t*b.vy*300)*0.06) * H;
+      const br = b.r * Math.min(W,H);
+
+      const g = ctx.createRadialGradient(bx,by,0, bx,by,br);
+      g.addColorStop(0,   b.c + b.a + ')');
+      g.addColorStop(0.5, b.c + (b.a*.4) + ')');
+      g.addColorStop(1,   b.c + '0)');
+
+      ctx.beginPath();
+      ctx.arc(bx,by,br,0,Math.PI*2);
+      ctx.fillStyle = g;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── Scroll reveal ── */
+const obs = new IntersectionObserver(en=>en.forEach(e=>{
+  if(e.isIntersecting) e.target.classList.add('visible');
+}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* ── Lightbox ── */
+const lb=document.getElementById('lb');
+const lbImg=document.getElementById('lbImg');
+const lbCap=document.getElementById('lbCap');
+document.querySelectorAll('.photo-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    lbImg.src=item.dataset.src;
+    lbCap.textContent=item.dataset.cap||'';
+    lb.classList.add('on');
+  });
+});
+document.getElementById('lbClose').addEventListener('click',()=>lb.classList.remove('on'));
+lb.addEventListener('click',e=>{if(e.target===lb)lb.classList.remove('on');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('on');});
+</script>
+</body>
+</html>
