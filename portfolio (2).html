@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Humbe Díaz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:  #111010;
+      --mid:  #777;
+      --pale: #bbb;
+      --rule: #e2e2e2;
+      --bg:   #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      cursor: none;
+    }
+
+    /* CURSOR */
+    .cur { width:5px;height:5px;background:var(--ink);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%); }
+    .cur-o { width:28px;height:28px;border:1px solid rgba(0,0,0,.2);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s; }
+    .cur-o.lg { width:48px;height:48px;border-color:rgba(0,0,0,.1); }
+
+    /* NAV */
+    nav {
+      position: fixed; top:0; left:0; right:0; z-index:500;
+      padding: 28px 52px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid transparent;
+      transition: border-color .3s;
+    }
+    nav.scrolled { border-color: var(--rule); }
+    .nav-brand {
+      font-family: 'Libre Baskerville', serif;
+      font-size: .78rem; letter-spacing: .16em; text-transform: uppercase;
+    }
+    .nav-links { list-style:none;display:flex;gap:32px; }
+    .nav-links a {
+      font-size:.56rem;letter-spacing:.26em;text-transform:uppercase;
+      color:var(--pale);text-decoration:none;transition:color .2s;
+    }
+    .nav-links a:hover { color:var(--ink); }
+
+    /* ══════════════════════
+       HERO
+    ══════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 55% 45%;
+      border-bottom: 1px solid var(--rule);
+    }
+    .hero-img {
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-img img {
+      width:100%; height:100%; object-fit:cover; display:block;
+      filter: grayscale(100%) contrast(1.06) brightness(.88);
+      opacity:0; animation: fadeIn 1.4s .1s forwards;
+    }
+    .hero-text {
+      padding: 120px 56px 52px;
+      display: flex; flex-direction:column; justify-content:space-between;
+      border-left: 1px solid var(--rule);
+    }
+    .hero-tag {
+      font-size:.54rem;letter-spacing:.32em;text-transform:uppercase;color:var(--pale);
+      opacity:0;animation:fadeUp .8s .4s forwards;
+    }
+    .hero-name {
+      font-family:'Libre Baskerville',serif;
+      font-size: clamp(3rem,5.5vw,5.8rem);
+      font-weight:700; line-height:.92; letter-spacing:-.01em;
+      opacity:0;animation:fadeUp .9s .55s forwards;
+    }
+    .hero-name em { font-style:italic;font-weight:400; }
+    .hero-name .period { color:var(--pale); }
+    .hero-desc-wrap {
+      opacity:0;animation:fadeUp .9s .75s forwards;
+    }
+    .hero-rule { width:28px;height:1px;background:var(--rule);margin-bottom:18px; }
+    .hero-desc {
+      font-size:.75rem;line-height:1.95;color:var(--mid);max-width:300px;
+    }
+    .hero-bottom {
+      display:flex;justify-content:space-between;align-items:flex-end;
+      border-top:1px solid var(--rule);padding-top:20px;
+      font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--pale);
+      opacity:0;animation:fadeIn .8s 1s forwards;
+    }
+
+    /* ══════════════════════
+       DESCRIPCIÓN
+    ══════════════════════ */
+    .about {
+      display: grid;
+      grid-template-columns: 28% 72%;
+      border-bottom: 1px solid var(--rule);
+      min-height: 55vh;
+    }
+    .about-label {
+      padding: 64px 40px;
+      border-right: 1px solid var(--rule);
+      display:flex;align-items:flex-start;justify-content:space-between;
+      flex-direction:column;
+    }
+    .about-label-tag {
+      font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--pale);
+    }
+    .about-label-num {
+      font-family:'Libre Baskerville',serif;
+      font-size:4.5rem;font-weight:700;color:var(--rule);line-height:1;
+    }
+    .about-body {
+      padding: 64px 56px;
+      display:flex;flex-direction:column;justify-content:space-between;
+    }
+    .about-heading {
+      font-family:'Libre Baskerville',serif;
+      font-size:clamp(1.6rem,2.4vw,2.4rem);
+      font-weight:700;line-height:1.15;margin-bottom:36px;
+    }
+    .about-heading em { font-style:italic;font-weight:400;color:var(--mid); }
+    .about-cols {
+      display:grid;grid-template-columns:1fr 1fr;gap:32px;
+      margin-bottom:48px;
+    }
+    .about-cols p { font-size:.72rem;line-height:2;color:var(--mid); }
+    .about-stats {
+      display:grid;grid-template-columns:repeat(3,1fr);
+      border-top:1px solid var(--rule);padding-top:28px;
+    }
+    .st { border-right:1px solid var(--rule);padding-right:20px; }
+    .st:first-child{padding-left:0}
+    .st:nth-child(2){padding-left:20px}
+    .st:last-child{border-right:none;padding-left:20px}
+    .st-n { font-family:'Libre Baskerville',serif;font-size:2rem;font-weight:700;line-height:1; }
+    .st-l { font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--pale);margin-top:4px; }
+
+    /* ══════════════════════
+       FOTOS
+    ══════════════════════ */
+    .gallery-head {
+      padding: 52px 52px 36px;
+      display:flex;align-items:baseline;justify-content:space-between;
+      border-bottom: 1px solid var(--rule);
+    }
+    .gallery-head-title {
+      font-family:'Libre Baskerville',serif;
+      font-size:clamp(1.8rem,3vw,2.8rem);
+      font-weight:700;
+    }
+    .gallery-head-title .period{color:var(--pale);}
+    .gallery-head-meta {
+      font-size:.54rem;letter-spacing:.26em;text-transform:uppercase;color:var(--pale);
+    }
+
+    .gallery-grid {
+      display:grid;gap:1px;
+      background:var(--rule);
+    }
+    .row { display:grid;gap:1px; }
+    .row.c2  { grid-template-columns:58% 1fr; }
+    .row.c3  { grid-template-columns:1fr 1fr 1fr; }
+    .row.c2r { grid-template-columns:1fr 58%; }
+
+    .g-cell {
+      overflow:hidden;position:relative;cursor:none;
+      background:var(--bg);
+    }
+    .g-cell.tall { aspect-ratio:3/4; }
+    .g-cell.wide { aspect-ratio:16/9; }
+    .g-cell.sq   { aspect-ratio:1; }
+    .g-cell.med  { aspect-ratio:4/3; }
+    .g-cell img {
+      width:100%;height:100%;object-fit:cover;display:block;
+      filter:grayscale(100%) contrast(1.06) brightness(.88);
+      transition:transform .8s cubic-bezier(.25,.46,.45,.94),filter .4s;
+    }
+    .g-cell:hover img { transform:scale(1.04);filter:grayscale(100%) contrast(1.09) brightness(.9); }
+    .g-over {
+      position:absolute;inset:0;
+      background:rgba(255,255,255,0);transition:background .3s;
+      display:flex;align-items:flex-end;padding:16px;
+    }
+    .g-cell:hover .g-over { background:rgba(255,255,255,.58); }
+    .g-meta { opacity:0;transform:translateY(5px);transition:opacity .22s,transform .22s; }
+    .g-cell:hover .g-meta { opacity:1;transform:translateY(0); }
+    .g-t { font-family:'Libre Baskerville',serif;font-style:italic;font-size:.82rem;color:var(--ink);display:block; }
+    .g-l { font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mid);display:block;margin-top:2px; }
+    .g-n { position:absolute;top:10px;right:12px;font-size:.56rem;color:rgba(0,0,0,.14);opacity:0;transition:opacity .22s; }
+    .g-cell:hover .g-n { opacity:1; }
+
+    /* ══════════════════════
+       CONTACTO
+    ══════════════════════ */
+    .contact {
+      display:grid;grid-template-columns:42% 58%;
+      border-top:1px solid var(--rule);
+      min-height:52vh;
+    }
+    .contact-left {
+      padding:72px 52px;
+      border-right:1px solid var(--rule);
+      display:flex;flex-direction:column;justify-content:space-between;
+    }
+    .contact-tag { font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--pale); }
+    .contact-title {
+      font-family:'Libre Baskerville',serif;
+      font-size:clamp(2rem,4vw,4rem);
+      font-weight:700;line-height:.95;
+    }
+    .contact-title em { font-style:italic;font-weight:400;color:var(--mid);font-size:.65em;display:block; }
+    .contact-title .period { color:var(--pale); }
+    .contact-email-block { border-top:1px solid var(--rule);padding-top:18px; }
+    .contact-email {
+      font-family:'Libre Baskerville',serif;
+      font-style:italic;font-size:.9rem;
+      color:var(--ink);text-decoration:none;
+      display:inline-flex;align-items:center;gap:10px;
+      transition:gap .2s;
+    }
+    .contact-email::after { content:'→';font-style:normal;font-size:.8rem; }
+    .contact-email:hover { gap:16px; }
+
+    .contact-right {
+      padding:72px 52px;
+      display:flex;flex-direction:column;gap:20px;justify-content:center;
+    }
+    .f-row { display:flex;flex-direction:column;gap:6px; }
+    .f-row label { font-size:.5rem;letter-spacing:.24em;text-transform:uppercase;color:var(--pale); }
+    .f-row input, .f-row textarea {
+      background:transparent;border:none;
+      border-bottom:1px solid var(--rule);
+      padding:8px 0;color:var(--ink);
+      font-family:'Raleway',sans-serif;font-size:.8rem;font-weight:300;
+      outline:none;resize:none;caret-color:var(--ink);
+      transition:border-color .25s;
+    }
+    .f-row input:focus,.f-row textarea:focus { border-color:var(--mid); }
+    .f-row textarea { height:58px; }
+    .f-btn {
+      align-self:flex-start;margin-top:6px;
+      padding:11px 28px;background:transparent;
+      border:1px solid var(--rule);color:var(--mid);
+      font-family:'Raleway',sans-serif;font-size:.52rem;
+      letter-spacing:.24em;text-transform:uppercase;cursor:none;
+      transition:border-color .25s,color .25s,background .25s;
+    }
+    .f-btn:hover { border-color:var(--ink);color:var(--bg);background:var(--ink); }
+
+    /* FOOTER */
+    footer {
+      border-top:1px solid var(--rule);
+      padding:20px 52px;
+      display:flex;justify-content:space-between;align-items:center;
+      font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--pale);
+    }
+    .ft-links{display:flex;gap:24px;}
+    .ft-links a{color:var(--pale);text-decoration:none;transition:color .2s;}
+    .ft-links a:hover{color:var(--ink);}
+
+    /* LIGHTBOX */
+    .lb{position:fixed;inset:0;background:rgba(255,255,255,.97);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;}
+    .lb.on{opacity:1;pointer-events:all;}
+    .lb img{max-width:78vw;max-height:78vh;object-fit:contain;filter:grayscale(100%) contrast(1.06);}
+    .lb-close{position:absolute;top:24px;right:40px;font-size:.5rem;letter-spacing:.24em;text-transform:uppercase;color:var(--pale);cursor:none;transition:color .2s;}
+    .lb-close:hover{color:var(--ink);}
+    .lb-cap{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-family:'Libre Baskerville',serif;font-style:italic;font-size:.85rem;color:var(--mid);white-space:nowrap;}
+
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(18px);transition:opacity .85s cubic-bezier(.25,.46,.45,.94),transform .85s cubic-bezier(.25,.46,.45,.94);}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+    .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+    @media(max-width:860px){
+      .hero{grid-template-columns:1fr}
+      .hero-img{height:55vw}
+      .hero-text{border-left:none;border-top:1px solid var(--rule);padding:40px 22px 36px}
+      .about{grid-template-columns:1fr}
+      .about-label{border-right:none;border-bottom:1px solid var(--rule);padding:32px 22px;flex-direction:row;align-items:center}
+      .about-body{padding:40px 22px}
+      .about-cols{grid-template-columns:1fr}
+      .row.c2,.row.c3,.row.c2r{grid-template-columns:1fr 1fr}
+      .contact{grid-template-columns:1fr}
+      .contact-left{border-right:none;border-bottom:1px solid var(--rule)}
+      nav,.gallery-head,.contact-left,.contact-right,.about-body,footer{padding-left:22px;padding-right:22px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-o" id="curO"></div>
+
+<div class="lb" id="lb">
+  <span class="lb-close" id="lbClose">Cerrar ✕</span>
+  <img src="" id="lbImg" alt=""/>
+  <div class="lb-cap" id="lbCap"></div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-brand">Humbe Díaz</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#fotos">Fotos</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-img">
+    <img src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=1200&q=85" alt="Humbe Díaz"/>
+  </div>
+  <div class="hero-text">
+    <div class="hero-tag">Fotografía — México</div>
+    <div>
+      <h1 class="hero-name">HUMBE<br><em>DÍAZ</em><span class="period">.</span></h1>
+    </div>
+    <div class="hero-desc-wrap">
+      <div class="hero-rule"></div>
+      <p class="hero-desc">Fotógrafo documental y de autor con sede en México. Una década explorando los márgenes: los espacios donde la luz apenas llega y los sujetos revelan lo que normalmente ocultan.</p>
+    </div>
+    <div class="hero-bottom">
+      <span>2016 — 2026</span>
+      <span>Ciudad de México</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DESCRIPCIÓN ══ -->
+<section id="about" class="about reveal">
+  <div class="about-label">
+    <div class="about-label-tag">About.</div>
+    <div class="about-label-num">01.</div>
+  </div>
+  <div class="about-body">
+    <div>
+      <h2 class="about-heading">El encuadre como<br><em>acto de elección</em></h2>
+      <div class="about-cols">
+        <p>Nacido en Ciudad de México. Desde los 18 años documenté comunidades en los márgenes del país, desarrollando un lenguaje visual que mezcla la tradición del fotoperiodismo con una sensibilidad más introspectiva y de largo aliento.</p>
+        <p>Mi trabajo parte de la convicción de que fotografiar es una forma de escuchar. Cada proyecto comienza con meses de inmersión antes de que aparezca la cámara. He publicado en revistas editoriales internacionales y exhibido en galerías de México, España y Argentina.</p>
+      </div>
+    </div>
+    <div class="about-stats">
+      <div class="st"><div class="st-n">14</div><div class="st-l">Años activo</div></div>
+      <div class="st"><div class="st-n">32</div><div class="st-l">Exposiciones</div></div>
+      <div class="st"><div class="st-n">9</div><div class="st-l">Países</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOTOS ══ -->
+<div id="fotos">
+  <div class="gallery-head reveal">
+    <h2 class="gallery-head-title">GALERÍA<span class="period">.</span></h2>
+    <span class="gallery-head-meta">Selección 2021 — 2024</span>
+  </div>
+  <div class="gallery-grid reveal">
+
+    <div class="row c2">
+      <div class="g-cell tall" data-src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=900&q=80" data-cap="Umbral — Oaxaca, 2022">
+        <img src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Umbral</span><span class="g-l">Oaxaca, 2022</span></div></div>
+        <span class="g-n">001</span>
+      </div>
+      <div class="g-cell sq" data-src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=900&q=80" data-cap="Polvo de luz — Monterrey, 2024">
+        <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Polvo de luz</span><span class="g-l">Monterrey, 2024</span></div></div>
+        <span class="g-n">002</span>
+      </div>
+    </div>
+
+    <div class="row c3">
+      <div class="g-cell med" data-src="https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=900&q=80" data-cap="Callejón — Guanajuato, 2021">
+        <img src="https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Callejón</span><span class="g-l">Guanajuato, 2021</span></div></div>
+        <span class="g-n">003</span>
+      </div>
+      <div class="g-cell med" data-src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80" data-cap="Silencio vertical — Puebla, 2023">
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Silencio vertical</span><span class="g-l">Puebla, 2023</span></div></div>
+        <span class="g-n">004</span>
+      </div>
+      <div class="g-cell med" data-src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=900&q=80" data-cap="La vigilia — Guadalajara, 2022">
+        <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">La vigilia</span><span class="g-l">Guadalajara, 2022</span></div></div>
+        <span class="g-n">005</span>
+      </div>
+    </div>
+
+    <div class="row c2r">
+      <div class="g-cell sq" data-src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=900&q=80" data-cap="Quietud — Chiapas, 2021">
+        <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Quietud</span><span class="g-l">Chiapas, 2021</span></div></div>
+        <span class="g-n">006</span>
+      </div>
+      <div class="g-cell tall" data-src="https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=900&q=80" data-cap="Cielos nocturnos — Baja California, 2024">
+        <img src="https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Cielos nocturnos</span><span class="g-l">Baja California, 2024</span></div></div>
+        <span class="g-n">007</span>
+      </div>
+    </div>
+
+    <div class="row c3">
+      <div class="g-cell med" data-src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80" data-cap="Horizonte — Yucatán, 2023">
+        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Horizonte</span><span class="g-l">Yucatán, 2023</span></div></div>
+        <span class="g-n">008</span>
+      </div>
+      <div class="g-cell med" data-src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=900&q=80" data-cap="Verde infinito — Chiapas, 2022">
+        <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Verde infinito</span><span class="g-l">Chiapas, 2022</span></div></div>
+        <span class="g-n">009</span>
+      </div>
+      <div class="g-cell med" data-src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=900&q=80" data-cap="Jardín efímero — Oaxaca, 2023">
+        <img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=900&q=80" alt="">
+        <div class="g-over"><div class="g-meta"><span class="g-t">Jardín efímero</span><span class="g-l">Oaxaca, 2023</span></div></div>
+        <span class="g-n">010</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ CONTACTO ══ -->
+<section id="contacto" class="contact reveal">
+  <div class="contact-left">
+    <div class="contact-tag">Contact.</div>
+    <div class="contact-title">
+      GET IN<br>
+      <em>touch</em>
+      <span class="period">.</span>
+    </div>
+    <div class="contact-email-block">
+      <a href="mailto:hola@humbediaz.com" class="contact-email">hola@humbediaz.com</a>
+    </div>
+  </div>
+  <div class="contact-right">
+    <div class="f-row"><label>Nombre</label><input type="text" placeholder="Tu nombre completo"></div>
+    <div class="f-row"><label>Correo electrónico</label><input type="email" placeholder="tu@correo.com"></div>
+    <div class="f-row"><label>Proyecto</label><input type="text" placeholder="Editorial, retrato, documental…"></div>
+    <div class="f-row"><label>Mensaje</label><textarea placeholder="Cuéntame sobre tu proyecto…"></textarea></div>
+    <button class="f-btn">Enviar mensaje</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Humbe Díaz</span>
+  <div class="ft-links">
+    <a href="#">Instagram</a>
+    <a href="#">Behance</a>
+    <a href="#">VSCO</a>
+  </div>
+</footer>
+
+<script>
+const cur=document.getElementById('cur'),curO=document.getElementById('curO');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function a(){
+  cur.style.cssText=`left:${mx}px;top:${my}px`;
+  rx+=(mx-rx)*.13;ry+=(my-ry)*.13;
+  curO.style.cssText=`left:${rx}px;top:${ry}px`;
+  requestAnimationFrame(a);
+})();
+document.querySelectorAll('a,button,.g-cell').forEach(el=>{
+  el.addEventListener('mouseenter',()=>curO.classList.add('lg'));
+  el.addEventListener('mouseleave',()=>curO.classList.remove('lg'));
+});
+
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40);
+});
+
+const obs=new IntersectionObserver(en=>en.forEach(e=>{
+  if(e.isIntersecting)e.target.classList.add('visible');
+}),{threshold:.05});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+const lb=document.getElementById('lb'),lbImg=document.getElementById('lbImg'),lbCap=document.getElementById('lbCap');
+document.querySelectorAll('.g-cell').forEach(item=>{
+  item.addEventListener('click',()=>{
+    lbImg.src=item.dataset.src;
+    lbCap.textContent=item.dataset.cap||'';
+    lb.classList.add('on');
+  });
+});
+document.getElementById('lbClose').addEventListener('click',()=>lb.classList.remove('on'));
+lb.addEventListener('click',e=>{if(e.target===lb)lb.classList.remove('on');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('on');});
+</script>
+</body>
+</html>
